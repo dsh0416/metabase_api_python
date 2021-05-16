@@ -491,7 +491,8 @@ class Metabase_API():
                 source_collection_name=None, source_collection_id=None,
                 destination_card_name=None, 
                 destination_collection_name=None, destination_collection_id=None,
-                postfix='', verbose=False):
+                postfix='', db_id=None, table_id=None,
+                verbose=False):
     """
     Copy the card with the given name/id to the given destination collection. 
     
@@ -535,6 +536,11 @@ class Metabase_API():
     card_json = source_card
     card_json['collection_id'] = destination_collection_id
     card_json['name'] = destination_card_name
+
+    if db_id is not None:
+      card_json['dataset_query']['database'] = db_id
+    if table_id is not None:
+      card_json['dataset_query']['query']['source-table'] = table_id
     
     # Fixing the issue #10
     if card_json.get('description') == '': 
@@ -604,6 +610,7 @@ class Metabase_API():
                      source_collection_name=None, source_collection_id=None,
                      destination_dashboard_name=None, 
                      destination_collection_name=None, destination_collection_id=None,
+                     db_id=None, table_id=None,
                      deepcopy=False, postfix=''):
     """
     Copy the dashboard with the given name/id to the given destination collection. 
@@ -664,7 +671,7 @@ class Metabase_API():
       source_dashboard_card_IDs = [ i['card_id'] for i in source_dashboard['ordered_cards'] if i['card_id'] is not None ]
       card_id_mapping = {}
       for card_id in source_dashboard_card_IDs:
-        dup_card_id = self.copy_card(source_card_id=card_id, destination_collection_id=cards_collection_id)
+        dup_card_id = self.copy_card(source_card_id=card_id, destination_collection_id=cards_collection_id, db_id=db_id, table_id=table_id)
         card_id_mapping[card_id] = dup_card_id
 
       # replacing cards in the duplicated dashboard with duplicated cards
